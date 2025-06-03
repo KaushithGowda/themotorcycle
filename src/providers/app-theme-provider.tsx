@@ -3,12 +3,11 @@ import { ThemeSyncer } from '@/components/theme-syncer'
 
 type ProviderProps = { children: React.ReactNode }
 
-export const Providers = ({ children }: ProviderProps) => {
+export const AppThemeProvider = ({ children }: ProviderProps) => {
   return (
     <ThemeProvider
       attribute='class'
       enableSystem
-      disableTransitionOnChange
       defaultTheme='system'
     >
       {children}
