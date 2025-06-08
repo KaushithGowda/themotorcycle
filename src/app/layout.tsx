@@ -24,11 +24,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang='en'>
+    <html lang='en' className='m-0 p-0 h-full' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 h-full`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className='flex justify-center items-center h-full w-full bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white '>
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   )
