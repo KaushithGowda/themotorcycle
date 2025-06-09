@@ -12,20 +12,21 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- 
+
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String          @unique
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   password      String
   accounts      Account[]
   sessions      Session[]
- 
-  createdAt DateTime @default(now())
+
+  createdAt DateTime  @default(now())
+  vehicles  Vehicle[]
 }
- 
+
 model Account {
   userId            String
   type              String
@@ -38,23 +39,43 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
- 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Vehicle Vehicle[]
+
   @@id([provider, providerAccountId])
 }
- 
+
 model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@id([identifier, token])
+}
+
+model Vehicle {
+  id         String   @id @default(cuid())
+  name       String
+  make       String
+  model      String
+  color      String
+  year       String
+  odoReading String
+  regNumber  String
+  imgUrl     String?
+  createdAt  DateTime @default(now())
+
+  userId                   String
+  user                     User     @relation(fields: [userId], references: [id])
+  Account                  Account? @relation(fields: [accountProvider, accountProviderAccountId], references: [provider, providerAccountId])
+  accountProvider          String?
+  accountProviderAccountId String?
 }

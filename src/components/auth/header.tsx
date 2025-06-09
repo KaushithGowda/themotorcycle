@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils/utils"
+import { cn } from "@/lib/utils"
 import { Poppins } from "next/font/google"
 
 const fonts = Poppins({
@@ -14,9 +14,9 @@ interface HeaderProps {
 const Header = ({label, title}: HeaderProps) => {
     return (
         <div className="flex flex-col items-center gap-y-1">
-            <h1 className={cn("text-5xl font-semibold drop-shadow-2xl capitalize", fonts.className)}>
+            <span className={cn("text-5xl font-semibold drop-shadow-2xl capitalize", fonts.className)}>
                 {title}
-            </h1>
+            </span>
             <p className="capitalize text-md">{label}</p>
         </div>
     )

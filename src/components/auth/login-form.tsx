@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 
 import { Poppins } from "next/font/google";
 
-import { cn } from "@/lib/utils/utils";
+import { cn } from "@/lib/utils";
 import FormSuccess from "@/components/form-success";
 import FormError from "@/components/form-error";
 import { login } from "@/actions/login";
