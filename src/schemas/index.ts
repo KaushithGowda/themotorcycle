@@ -3,13 +3,13 @@ import { z } from 'zod'
 export const LoginSchema = z.object({
   email: z
     .string()
-    .min(5, { message: 'email must be atleast 2 characters' })
-    .max(15, { message: 'email cannot be more than 15 characters' })
+    .min(5, { message: 'Email must be at least 2 characters' })
+    .max(15, { message: 'Email cannot be more than 15 characters' })
     .nonempty(),
   password: z
     .string()
-    .min(5, { message: 'password must be atleast 2 characters' })
-    .max(15, { message: 'password cannot be more than 15 characters' })
+    .min(5, { message: 'Password must be at least 2 characters' })
+    .max(15, { message: 'Password cannot be more than 15 characters' })
     .nonempty(),
   // .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/, {
   //   message:
@@ -20,19 +20,19 @@ export const LoginSchema = z.object({
 export const RegisterSchema = z.object({
   email: z
     .string()
-    .min(5, { message: 'email must be atleast 2 characters' })
-    .max(15, { message: 'email cannot be more than 15 characters' })
-    .nonempty({ message: 'email is required' }),
+    .min(5, { message: 'Email must be at least 2 characters' })
+    .max(15, { message: 'Email cannot be more than 15 characters' })
+    .nonempty({ message: 'Email is required' }),
   name: z
     .string()
-    .min(5, { message: 'name must be atleast 2 characters' })
-    .max(15, { message: 'name cannot be more than 15 characters' })
-    .nonempty({ message: 'name is required' }),
+    .min(5, { message: 'Name must be at least 2 characters' })
+    .max(15, { message: 'Name cannot be more than 15 characters' })
+    .nonempty({ message: 'Name is required' }),
   password: z
     .string()
-    .min(5, { message: 'password must be atleast 2 characters' })
-    .max(15, { message: 'password cannot be more than 15 characters' })
-    .nonempty({ message: 'password is required' }),
+    .min(5, { message: 'Password must be at least 2 characters' })
+    .max(15, { message: 'Password cannot be more than 15 characters' })
+    .nonempty({ message: 'Password is required' }),
   // .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/, {
   //   message:
   //     'Password must include at least one lowercase letter, one uppercase letter, one number, and one special character',
@@ -40,33 +40,74 @@ export const RegisterSchema = z.object({
 })
 
 export const VehicleSchema = z.object({
-  name: z
-    .string()
-    .min(5, { message: 'name must be atleast 5 characters' })
-    .max(15, { message: 'name cannot be more than 15 characters' })
-    .nonempty({ message: 'name is required' }),
   make: z
     .string()
-    .min(3, { message: 'make must be atleast 3 characters' })
-    .max(15, { message: 'make cannot be more than 15 characters' })
-    .nonempty({ message: 'make is required' }),
+    .min(3, { message: 'Make must be at least 3 characters' })
+    .max(15, { message: 'Make cannot be more than 15 characters' })
+    .nonempty({ message: 'Make is required' }),
   model: z
     .string()
-    .min(3, { message: 'model must be atleast 3 characters' })
-    .max(15, { message: 'model cannot be more than 15 characters' })
-    .nonempty({ message: 'model is required' }),
+    .min(3, { message: 'Model must be at least 3 characters' })
+    .max(15, { message: 'Model cannot be more than 15 characters' })
+    .nonempty({ message: 'Model is required' }),
   color: z
     .string()
-    .min(3, { message: 'color must be atleast 3 characters' })
-    .max(15, { message: 'color cannot be more than 15 characters' })
-    .nonempty({ message: 'color is required' }),
-  year: z.number(),
+    .nonempty({ message: 'Color is required' })
+    .refine(
+      (val) =>
+        [
+          'black',
+          'white',
+          'gray',
+          'silver',
+          'red',
+          'blue',
+          'green',
+          'yellow',
+          'orange',
+          'brown',
+          'purple',
+          'pink',
+          'gold',
+        ].includes(val),
+      { message: 'Invalid color selected' }
+    ),
+  dateOfReg: z
+    .string()
+    .nonempty({ message: 'Registration date is required' })
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: 'Invalid registration date',
+    }),
   odoReading: z
     .number()
-    .max(7, { message: 'odoReading cannot be more than 7 characters' }),
+    .min(0, { message: 'Odometer must be at least 0' })
+    .max(9999999, { message: 'Odometer cannot exceed 7 digits' }),
   regNumber: z
     .string()
-    .min(5, { message: 'Register Number must be atleast 5 characters' })
-    .max(10, { message: 'Register Number cannot be more than 10 characters' })
-    .nonempty({ message: 'Register Number is required' }),
+    .min(5, { message: 'Register number must be at least 5 characters' })
+    .max(10, { message: 'Register number cannot be more than 10 characters' })
+    .nonempty({ message: 'Register number is required' }),
+  imgUrl: z.string().optional().nullable(),
+  cubicCapacity: z.string().optional(),
+  horsePower: z.string().optional(),
+  torque: z.string().optional(),
+})
+
+export const PartSchema = z.object({
+  partName: z.string().min(1, { message: 'Part name is required' }),
+  partNumber: z.string().min(1, { message: 'Part number is required' }),
+  startOdo: z.string().nonempty({ message: 'Start Odo is required' }),
+  endOdo: z.string().nonempty({ message: 'End Odo is required' }),
+  imgUrl: z.string().optional().nullable(),
+  startDate: z.string().nonempty({ message: 'Start date is required' }),
+  endDate: z.string().nonempty({ message: 'End date is required' }),
+})
+
+export const ProfileSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: 'Name must be at least 3 characters' })
+    .max(30, { message: 'Name cannot be more than 30 characters' })
+    .nonempty({ message: 'Name is required' }),
+  imgUrl: z.string().optional().nullable(),
 })

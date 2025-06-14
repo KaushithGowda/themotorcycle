@@ -1,7 +1,7 @@
-import VehicleForm from '@/components/vehicles/vehicles-form'
+import { VehicleList } from '@/components/vehicles/vehicles-list'
 
 const Vehicles = () => {
-  return <VehicleForm />
+  return <VehicleList />
 }
 
 export default Vehicles

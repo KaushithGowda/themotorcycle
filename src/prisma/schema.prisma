@@ -19,7 +19,7 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   image         String?
-  password      String
+  password      String?
   accounts      Account[]
   sessions      Session[]
 
@@ -63,11 +63,13 @@ model VerificationToken {
 
 model Vehicle {
   id         String   @id @default(cuid())
-  name       String
   make       String
   model      String
+  cubicCapacity String?
+  horsePower    String?
+  torque        String?
   color      String
-  year       String
+  dateOfReg  String
   odoReading String
   regNumber  String
   imgUrl     String?
@@ -78,4 +80,21 @@ model Vehicle {
   Account                  Account? @relation(fields: [accountProvider, accountProviderAccountId], references: [provider, providerAccountId])
   accountProvider          String?
   accountProviderAccountId String?
+
+  parts      Part[]
+}
+
+model Part {
+  id         String   @id @default(cuid())
+  partName   String
+  partNumber String
+  startOdo   String
+  endOdo     String
+  startDate  String
+  endDate    String
+  imgUrl     String?
+  createdAt  DateTime @default(now())
+
+  vehicleId  String
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 }

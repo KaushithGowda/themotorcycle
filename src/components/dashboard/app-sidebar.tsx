@@ -4,7 +4,7 @@ import * as React from 'react'
 import { CiHome } from 'react-icons/ci'
 import { MdForum } from 'react-icons/md'
 import { FaBlogger } from 'react-icons/fa'
-import { RiSettingsLine } from 'react-icons/ri'
+import { FaUser } from 'react-icons/fa'
 import { SiOrganicmaps } from 'react-icons/si'
 import { GiFullMotorcycleHelmet } from 'react-icons/gi'
 import {
@@ -49,9 +49,9 @@ const data = {
           icon: SiOrganicmaps,
         },
         {
-          title: 'Settings',
-          url: '/settings',
-          icon: RiSettingsLine,
+          title: 'Profile',
+          url: '/profile',
+          icon: FaUser,
         },
       ],
     },
@@ -77,7 +77,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => {
-                  const isActive = pathname.startsWith(item.url)
+                  const isActive =
+                    item.url === '/'
+                      ? pathname === '/'
+                      : pathname.startsWith(item.url)
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild isActive={isActive}>

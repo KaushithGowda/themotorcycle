@@ -13,8 +13,7 @@ export const publicRoutes: string[] = [
  * @type {string[]}
  */
 export const authRoutes: string[] = [
-    '/auth/login',
-    '/auth/register',
+    '/auth',
     '/auth/error'
 ]
 
@@ -30,4 +29,4 @@ export const apiAuthPrefix: string = '/api/auth'
  * Default redirect path after login 
  * @type {string}
  */
-export const Default_Redirect_Path: string = '/settings'
+export const Default_Redirect_Path: string = '/'

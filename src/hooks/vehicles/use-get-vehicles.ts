@@ -6,11 +6,14 @@ type Vehicle = {
   make: string
   model: string
   color: string
-  year: number
+  dateOfReg: string
   odoReading: number
   regNumber: string
   imgUrl: string | null
   createdAt: string
+  cubicCapacity?: string
+  horsePower?: string
+  torque?: string
 }
 
 export const useGetVehicles = () => {

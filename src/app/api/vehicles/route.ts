@@ -7,12 +7,6 @@ import path from 'path'
 import fs from 'fs/promises'
 import { Readable } from 'stream'
 
-// Disable default body parser
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
 
 const uploadDir = path.join(process.cwd(), 'public', 'uploads')
 
@@ -48,34 +42,48 @@ export async function POST(request: NextRequest) {
     await fs.mkdir(uploadDir, { recursive: true })
 
     const [fields, files] = await parseForm(request)
-    console.log({ fields })
+    console.log({ fields, files })
 
-    const name = fields.name?.[0] ?? ''
-    const make = fields.make?.[0] ?? ''
-    const model = fields.model?.[0] ?? ''
-    const color = fields.color?.[0] ?? ''
-    const year = fields.year?.[0] ?? 1969
-    const odoReading = fields.odoReading?.[0] ?? 0
-    const regNumber = fields.regNumber?.[0] ?? ''
+    const make = fields.make ?? null
+    const model = fields.model ?? null
+    const color = fields.color ?? null
+    const dateOfReg = fields.dateOfReg ?? new Date().toISOString()
+    const odoReading = fields.odoReading ?? '0'
+    const regNumber = fields.regNumber ?? null
+    const horsePower = fields.horsePower ?? null
+    const torque = fields.torque ?? null
+    const cubicCapacity = fields.cubicCapacity ?? null
 
-    const image = files?.image?.[0] ?? null
-    const imgUrl = image ? `/uploads/${path.basename(image.filepath)}` : null
+    const image = files?.imgUrl ?? null
+    let imgUrl: string | null = null
+    if (image?.filepath) {
+      imgUrl = `/uploads/${path.basename(image.filepath)}`
+    }
+
+    console.log('Received form:', { fields, files })
 
     const user = await db.user.findUnique({
       where: { email: session.user.email as string },
     })
 
+    if (!user) {
+      console.error('User not found for session:', session.user.email)
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
     const newVehicle = await db.vehicle.create({
       data: {
-        name,
         color,
         make,
         model,
         odoReading,
         regNumber,
-        year,
+        dateOfReg,
+        horsePower: horsePower ?? null,
+        torque: torque ?? null,
+        cubicCapacity: cubicCapacity ?? null,
         imgUrl,
-        userId: user!.id,
+        userId: user.id,
       },
     })
 
@@ -117,7 +125,7 @@ export async function GET() {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Error fetching vechiles!', error)
+    console.error('Error fetching vehicles!', error)
     return NextResponse.json({ error }, { status: 500 })
   }
 }
@@ -138,15 +146,22 @@ export async function PATCH(
 
     const { vehicleId } = params
 
+    if (!vehicleId) {
+      return NextResponse.json({ error: 'Vehicle ID missing' }, { status: 400 })
+    }
+
     const data: any = {
-      name: fields.name?.[0],
       make: fields.make?.[0],
       model: fields.model?.[0],
       color: fields.color?.[0],
-      year: Number(fields.year?.[0]) || 1969,
+      dateOfReg: fields.dateOfReg?.[0] ?? new Date().toISOString(),
       odoReading: Number(fields.odoReading?.[0]) || 0,
       regNumber: fields.regNumber?.[0],
     }
+
+    if (fields.cubicCapacity?.[0]) data.cubicCapacity = fields.cubicCapacity[0]
+    if (fields.horsePower?.[0]) data.horsePower = fields.horsePower[0]
+    if (fields.torque?.[0]) data.torque = fields.torque[0]
 
     const image = files?.image?.[0]
     if (image) data.imgUrl = `/uploads/${path.basename(image.filepath)}`

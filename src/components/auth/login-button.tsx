@@ -13,7 +13,7 @@ export const LoginButton = ({ children, mode = 'redirect' }: LoginButtonProps) =
     const router = useRouter();
 
     function onClick() {
-        router.push('/auth/login')
+        router.push('/auth')
     }
 
     if (mode === 'modal') return <></>

@@ -8,7 +8,7 @@ import { getUserById } from "@/data/user"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
-    signIn: "/auth/login",
+    signIn: "/auth",
     error: "/auth/error",
   },
   events:{
