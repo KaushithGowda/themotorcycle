@@ -23,7 +23,10 @@ export const useUpdateVehicle = ({
 
       Object.entries(values).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          if (typeof File !== 'undefined' && value instanceof File) {
+          if (
+            typeof File !== 'undefined' &&
+            typeof value === 'object'
+          ) {
             formData.append(key, value)
           } else if (value !== '') {
             formData.append(key, String(value))

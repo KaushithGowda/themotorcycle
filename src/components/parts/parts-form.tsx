@@ -29,7 +29,9 @@ const PartsForm = ({
   onSuccess?: () => void
   onError?: (err: Error) => void
 }) => {
-  const {vehicleId, partId} = useParams();
+  const { vehicleId: rawVehicleId, partId: rawPartId } = useParams();
+  const vehicleId = typeof rawVehicleId === 'string' || typeof rawVehicleId === 'number' ? rawVehicleId : '';
+  const partId = typeof rawPartId === 'string' || typeof rawPartId === 'number' ? rawPartId : '';
 
   const form = useForm<z.infer<typeof PartSchema>>({
     resolver: zodResolver(PartSchema),

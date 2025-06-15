@@ -18,7 +18,7 @@ export const useCreateVehicle = ({
       const formData = new FormData()
       Object.entries(values).forEach(([key, val]) => {
         if (val !== undefined && val !== null) {
-          if (typeof File !== 'undefined' && val instanceof File) {
+          if (typeof val === 'object' && typeof File !== 'undefined') {
             formData.append(key, val)
           } else if (val !== '') {
             formData.append(key, String(val))
