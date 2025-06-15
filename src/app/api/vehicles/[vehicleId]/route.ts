@@ -2,17 +2,15 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+export async function GET(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: 'Unauthorized user!' }, { status: 401 })
   }
 
-  const { vehicleId } = params
+  const parts = request.nextUrl.pathname.split('/');
+  const vehicleId = parts[parts.indexOf('vehicles') + 1];
 
   if (!vehicleId) {
     return NextResponse.json({ error: 'Vehicle ID missing' }, { status: 400 })
@@ -32,22 +30,22 @@ export async function GET(
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 })
     }
 
-    return NextResponse.json( vehicle, { status: 200 })
+    return NextResponse.json(vehicle, { status: 200 })
   } catch (error) {
     console.log('Error fetching vehicle details!', error)
-    return NextResponse.json({ error }, { status: 400 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function PATCH(request: NextRequest,
-  {params} : {params: {vehicleId: string}}) {    
+export async function PATCH(request: NextRequest) {    
   
   const session = await auth();
   if(!session || !session.user) {
     return NextResponse.json({error:'Unauthorized user!'},{status: 401})
   }
 
-  const {vehicleId} = params;
+  const parts = request.nextUrl.pathname.split('/');
+  const vehicleId = parts[parts.indexOf('vehicles') + 1];
 
   console.log({vehicleId});
 
@@ -62,22 +60,22 @@ export async function PATCH(request: NextRequest,
     const update = await db.vehicle.update({
       where: {id: vehicleId},
       data: {
-        make: fields.make as string,
-        model: fields.model as string,
-        color: fields.color as string,
-        dateOfReg: fields.dateOfReg as string,
-        odoReading: fields.odoReading as string,
-        regNumber: fields.regNumber as string,
-        imgUrl: fields.imgUrl ? (fields.imgUrl as string) : undefined,
-        cubicCapacity: fields.cubicCapacity as string,
-        horsePower: fields.horsePower as string,
-        torque: fields.torque as string,
+        make: fields.make?.toString(),
+        model: fields.model?.toString(),
+        color: fields.color?.toString(),
+        dateOfReg: fields.dateOfReg?.toString(),
+        odoReading: fields.odoReading?.toString(),
+        regNumber: fields.regNumber?.toString(),
+        imgUrl: fields.imgUrl ? fields.imgUrl.toString() : undefined,
+        cubicCapacity: fields.cubicCapacity?.toString(),
+        horsePower: fields.horsePower?.toString(),
+        torque: fields.torque?.toString(),
       }
     })
 
     return NextResponse.json(update, {status: 200})
   } catch (error) {
     console.error('Error while updating the vehicle!', error);
-    return NextResponse.json({error},{status: 500})
+    return NextResponse.json({error: 'Internal server error'}, {status: 500})
   }
 }

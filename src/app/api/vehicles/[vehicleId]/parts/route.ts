@@ -1,18 +1,17 @@
-
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 
-export async function POST(request: NextRequest, { params }: { params: { vehicleId: string } }) {
+export async function POST(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { vehicleId } = params
+  const pathParts = request.nextUrl.pathname.split('/')
+  const vehicleId = pathParts[pathParts.indexOf('vehicles') + 1]
+
   if (!vehicleId) {
     return NextResponse.json({ error: 'Vehicle ID missing' }, { status: 400 })
   }
@@ -30,9 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: { vehicle
     } = body
 
     const vehicle = await db.vehicle.findUnique({
-      where: {
-        id: vehicleId,
-      },
+      where: { id: vehicleId },
     })
 
     if (!vehicle) {
@@ -59,26 +56,24 @@ export async function POST(request: NextRequest, { params }: { params: { vehicle
   }
 }
 
-export async function GET(_request: NextRequest, { params }: { params: { vehicleId: string } }) {
+export async function GET(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { vehicleId } = params
+  const pathParts = request.nextUrl.pathname.split('/')
+  const vehicleId = pathParts[pathParts.indexOf('vehicles') + 1]
+
   if (!vehicleId) {
     return NextResponse.json({ error: 'Vehicle ID missing' }, { status: 400 })
   }
 
   try {
     const parts = await db.part.findMany({
-      where: {
-        vehicleId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      where: { vehicleId },
+      orderBy: { createdAt: 'desc' },
     })
 
     return NextResponse.json({ parts }, { status: 200 })

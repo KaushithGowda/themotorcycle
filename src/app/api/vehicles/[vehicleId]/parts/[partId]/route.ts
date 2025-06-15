@@ -37,6 +37,9 @@ export async function PATCH(request: NextRequest) {
 
   const partId = request.nextUrl.pathname.split('/').pop()
   const body = await request.json()
+  if (!body.partName || typeof body.partName !== 'string') {
+    return NextResponse.json({ error: 'Invalid part name' }, { status: 400 })
+  }
 
   try {
     const updatedPart = await db.part.update({

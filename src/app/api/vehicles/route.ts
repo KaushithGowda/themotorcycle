@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import formidable from 'formidable'
 import { db } from '@/lib/db'
 import path from 'path'
 import fs from 'fs/promises'
-import { Readable } from 'stream'
-
 
 const uploadDir = path.join(process.cwd(), 'public', 'uploads')
 
-async function parseForm(req: NextRequest): Promise<any> {
+async function parseForm(
+  req: NextRequest
+): Promise<[formidable.Fields, formidable.Files]> {
   return new Promise((resolve, reject) => {
     const form = formidable({
       multiples: false,
@@ -18,17 +17,22 @@ async function parseForm(req: NextRequest): Promise<any> {
       uploadDir,
     })
 
-    // Convert Web ReadableStream to Node Readable
-    const nodeReq = Object.assign(Readable.fromWeb(req.body as any), {
+    // Use the native Node.js request stream directly
+    const nodeReq = Object.assign(req, {
       headers: Object.fromEntries(req.headers.entries()),
       method: req.method,
       url: '',
     })
 
-    form.parse(nodeReq as any, (err, fields, files) => {
-      if (err) reject(err)
-      else resolve([fields, files])
-    })
+    // Import IncomingMessage from 'http' at the top of the file:
+    // import { IncomingMessage } from 'http'
+    form.parse(
+      nodeReq as unknown as import('http').IncomingMessage,
+      (err, fields, files) => {
+        if (err) reject(err)
+        else resolve([fields, files])
+      }
+    )
   })
 }
 export async function POST(request: NextRequest) {
@@ -44,20 +48,26 @@ export async function POST(request: NextRequest) {
     const [fields, files] = await parseForm(request)
     console.log({ fields, files })
 
-    const make = fields.make ?? null
-    const model = fields.model ?? null
-    const color = fields.color ?? null
-    const dateOfReg = fields.dateOfReg ?? new Date().toISOString()
-    const odoReading = fields.odoReading ?? '0'
-    const regNumber = fields.regNumber ?? null
+    const make = Array.isArray(fields.make) ? fields.make[0] : fields.make ?? ''
+    const model = Array.isArray(fields.model) ? fields.model[0] : fields.model ?? ''
+    const color = Array.isArray(fields.color) ? fields.color[0] : fields.color ?? ''
+    const dateOfReg = Array.isArray(fields.dateOfReg) ? fields.dateOfReg[0] : fields.dateOfReg ?? new Date().toISOString()
+    const odoReading = Array.isArray(fields.odoReading)
+      ? fields.odoReading[0]
+      : fields.odoReading ?? '0'
+    const regNumber = Array.isArray(fields.regNumber)
+      ? fields.regNumber[0]
+      : fields.regNumber ?? ''
     const horsePower = fields.horsePower ?? null
     const torque = fields.torque ?? null
     const cubicCapacity = fields.cubicCapacity ?? null
 
-    const image = files?.imgUrl ?? null
+    const image = Array.isArray(files?.imgUrl)
+      ? files.imgUrl[0]
+      : files?.imgUrl ?? null
     let imgUrl: string | null = null
-    if (image?.filepath) {
-      imgUrl = `/uploads/${path.basename(image.filepath)}`
+    if (image && (image as formidable.File).filepath) {
+      imgUrl = `/uploads/${path.basename((image as formidable.File).filepath)}`
     }
 
     console.log('Received form:', { fields, files })
@@ -79,9 +89,9 @@ export async function POST(request: NextRequest) {
         odoReading,
         regNumber,
         dateOfReg,
-        horsePower: horsePower ?? null,
-        torque: torque ?? null,
-        cubicCapacity: cubicCapacity ?? null,
+        horsePower: Array.isArray(horsePower) ? horsePower[0] : horsePower ?? null,
+        torque: Array.isArray(torque) ? torque[0] : torque ?? null,
+        cubicCapacity: Array.isArray(cubicCapacity) ? cubicCapacity[0] : cubicCapacity ?? null,
         imgUrl,
         userId: user.id,
       },
@@ -130,10 +140,20 @@ export async function GET() {
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+interface VehicleUpdateData {
+  make?: string
+  model?: string
+  color?: string
+  dateOfReg?: string
+  odoReading?: string
+  regNumber?: string
+  cubicCapacity?: string
+  horsePower?: string
+  torque?: string
+  imgUrl?: string
+}
+
+export async function PATCH(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session?.user)
@@ -144,27 +164,32 @@ export async function PATCH(
 
     const [fields, files] = await parseForm(request)
 
-    const { vehicleId } = params
+    const url = request.nextUrl.pathname
+    const parts = url.split('/')
+    const vehicleId = parts[parts.indexOf('vehicles') + 1]
 
     if (!vehicleId) {
       return NextResponse.json({ error: 'Vehicle ID missing' }, { status: 400 })
     }
 
-    const data: any = {
-      make: fields.make?.[0],
-      model: fields.model?.[0],
-      color: fields.color?.[0],
+    const data: VehicleUpdateData = {
+      make: fields.make?.[0] ?? '',
+      model: fields.model?.[0] ?? '',
+      color: fields.color?.[0] ?? '',
       dateOfReg: fields.dateOfReg?.[0] ?? new Date().toISOString(),
-      odoReading: Number(fields.odoReading?.[0]) || 0,
-      regNumber: fields.regNumber?.[0],
+      odoReading: fields.odoReading?.[0] ?? '0',
+      regNumber: fields.regNumber?.[0] ?? '',
     }
 
-    if (fields.cubicCapacity?.[0]) data.cubicCapacity = fields.cubicCapacity[0]
-    if (fields.horsePower?.[0]) data.horsePower = fields.horsePower[0]
-    if (fields.torque?.[0]) data.torque = fields.torque[0]
+    data.cubicCapacity = fields.cubicCapacity?.[0] ?? ''
+    data.horsePower = fields.horsePower?.[0] ?? ''
+    data.torque = fields.torque?.[0] ?? ''
 
-    const image = files?.image?.[0]
-    if (image) data.imgUrl = `/uploads/${path.basename(image.filepath)}`
+    const image = Array.isArray(files?.imgUrl)
+      ? (files.imgUrl[0] as formidable.File)
+      : (files?.imgUrl as unknown as formidable.File)
+    if (image?.filepath)
+      data.imgUrl = `/uploads/${path.basename(image.filepath)}`
 
     const updatedVehicle = await db.vehicle.update({
       where: {
