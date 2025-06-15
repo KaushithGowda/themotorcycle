@@ -7,15 +7,29 @@ import { Separator } from '@/components/ui/separator'
 import { FaPen, FaLongArrowAltRight } from 'react-icons/fa'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useToast } from '@/hooks/utils/use-toast'
+import { ErrorState } from '../shared/error-state'
 
 export const PartsList = () => {
-  const {vehicleId} = useParams();
-  console.log({vehicleId});
-  
-  const { data: parts, isLoading, isError } = useGetParts(String(vehicleId ?? ''))
+  const { vehicleId } = useParams()
+  console.log({ vehicleId })
 
-  if (isError) return <p>Error loading parts.</p>
-  if (isLoading) return <p>Loading parts...</p>
+  const {
+    data: parts,
+    isLoading,
+    isError,
+    error,
+  } = useGetParts(String(vehicleId ?? ''))
+
+  useToast({
+    isError,
+    errorMsg: error?.message,
+    isLoading,
+  })
+
+  if (isError)
+    return <ErrorState heading={error?.name} message={error?.message} />
+
   if (!parts || parts.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 w-full'>
@@ -49,20 +63,27 @@ export const PartsList = () => {
           </Button>
           <div className='px-4 py-4'>
             <span className='font-extrabold text-lg text-primary capitalize'>
-              {part.partName}
+              {part.name}
             </span>
             <div className='flex items-center gap-2 text-xs text-muted-foreground mt-1'>
               <span>Part No: {part.partNumber}</span>
               <Separator orientation='vertical' className='h-4' />
-              <span>ODO: {part.startOdo} - {part.endOdo}</span>
+              <span>
+                ODO: {part.startOdo} - {part.endOdo}
+              </span>
             </div>
             <div className='text-xs text-muted-foreground mt-2'>
               {part.startDate} → {part.endDate}
             </div>
             <div className='mt-4'>
-              <Button asChild variant='link' className='text-primary p-0 text-xs'>
+              <Button
+                asChild
+                variant='link'
+                className='text-primary p-0 text-xs'
+              >
                 <Link href={`/parts/${part.id}`}>
-                  View Details <FaLongArrowAltRight className='ml-1 inline-block' />
+                  View Details{' '}
+                  <FaLongArrowAltRight className='ml-1 inline-block' />
                 </Link>
               </Button>
             </div>

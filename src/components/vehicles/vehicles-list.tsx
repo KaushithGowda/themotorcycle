@@ -9,12 +9,21 @@ import RegNumber from './reg-number'
 import { Button } from '../ui/button'
 import { FaLongArrowAltRight, FaPen } from 'react-icons/fa'
 import Link from 'next/link'
+import { useToast } from '@/hooks/utils/use-toast'
+import { ErrorState } from '../shared/error-state'
 
 export const VehicleList = () => {
-  const { data: vehicles, isLoading, isError } = useGetVehicles()
+  const { data: vehicles, isLoading, isError, error } = useGetVehicles()
 
-  if (isError) return <p>Error</p>
-  if (isLoading) return <p>Loading...</p>
+  useToast({
+    isError,
+    errorMsg: error?.message,
+    isLoading,
+  })
+
+  if (isError || !vehicles)
+    return <ErrorState heading={error?.name} message={error?.message} />
+
   if (!vehicles || vehicles.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 w-full'>

@@ -1,6 +1,12 @@
 import { axiosInstance } from "@/lib/api/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
+type UpdatePartInput = {
+  partId: string | number
+  vehicleId: string | number
+  [key: string]: unknown
+}
+
 // Update part
 export const useUpdatePart = ({
   onSuccess,
@@ -10,8 +16,9 @@ export const useUpdatePart = ({
   onError: (err: Error) => void
 }) => {
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: async ({ partId, vehicleId, ...values }: any) => {
+    mutationFn: async ({ partId, vehicleId, ...values }: UpdatePartInput) => {
       const formData = new FormData()
       Object.entries(values).forEach(([key, val]) => {
         if (val !== undefined && val !== null) {

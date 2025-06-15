@@ -10,6 +10,8 @@ import {
 import { AppSidebar } from '@/components/dashboard/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { auth } from '@/auth'
+import GlobalLoadingClient from '@/components/shared/global-client-loader'
+import { Toaster } from 'react-hot-toast'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,6 +41,13 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 h-full`}
       >
         <Providers>
+          <Toaster
+            position='top-center'
+            toastOptions={{
+              duration: 3000,
+            }}
+          />
+          <GlobalLoadingClient />
           {session?.user ? (
             <div>
               <SidebarProvider>

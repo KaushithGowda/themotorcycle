@@ -9,7 +9,6 @@ type ToastMsg = {
 export const showToast = {
   success: (msg: string) => toast.success(msg),
   error: (msg: string) => toast.error(msg),
-  loading: (msg: string) => toast.loading(msg),
   promise: <T>(promise: Promise<T>, msg: ToastMsg) =>
     toast.promise(promise, {
       loading: msg.loading,
