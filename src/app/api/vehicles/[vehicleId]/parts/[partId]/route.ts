@@ -1,21 +1,16 @@
-
-
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { partId: string } }
-) {
+export async function GET(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { partId } = params
+  const partId = request.nextUrl.pathname.split('/').pop()
 
   try {
     const part = await db.part.findUnique({
@@ -33,17 +28,14 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { partId: string } }
-) {
+export async function PATCH(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { partId } = params
+  const partId = request.nextUrl.pathname.split('/').pop()
   const body = await request.json()
 
   try {
@@ -68,17 +60,14 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { partId: string } }
-) {
+export async function DELETE(request: NextRequest) {
   const session = await auth()
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { partId } = params
+  const partId = request.nextUrl.pathname.split('/').pop()
 
   try {
     await db.part.delete({
