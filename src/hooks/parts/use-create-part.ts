@@ -11,7 +11,7 @@ export const useCreatePart = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (values: any) => {
+    mutationFn: async (values: { vehicleId: string; [key: string]: unknown }) => {
       const formData = new FormData()
       const { vehicleId, ...rest } = values
       console.log({vehicleId});
