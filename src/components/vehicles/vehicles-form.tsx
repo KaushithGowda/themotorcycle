@@ -40,7 +40,7 @@ const VehicleForm = ({
 }) => {
   const route = useRouter()
 
-  const { upload, isUploading, error: uploadError } = useFileUpload()
+  const { upload } = useFileUpload()
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -117,7 +117,7 @@ const VehicleForm = ({
   }, [defaultValues, form])
 
   const isPending =
-    createMutation.isPending || updateMutation.isPending || isUploading
+    createMutation.isPending || updateMutation.isPending
 
   return (
     <div className='p-6 max-w-6xl'>
@@ -354,9 +354,6 @@ const VehicleForm = ({
           <div className='space-y-3 mt-4'>
             {error && (
               <p className='text-sm text-red-500 font-medium'>{error}</p>
-            )}
-            {uploadError && (
-              <p className='text-sm text-red-500 font-medium'>{uploadError}</p>
             )}
             {success && (
               <p className='text-sm text-green-600 font-medium'>{success}</p>
