@@ -20,6 +20,9 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  phoneNumber   String? 
+  dexp          String?
+  rexp          String?
   accounts      Account[]
   sessions      Session[]
 

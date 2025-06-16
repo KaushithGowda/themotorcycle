@@ -1,5 +1,3 @@
-
-
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
@@ -19,7 +17,13 @@ export async function GET() {
         id: true,
         name: true,
         email: true,
+        phoneNumber: true,
         image: true,
+        vehicles: true,
+        createdAt: true,
+        dexp: true,
+        rexp: true,
+        emailVerified: true
       },
     })
 
@@ -44,19 +48,25 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { name, image } = body
+    const { name, image, phoneNumber, dexp, rexp } = body
 
     const updatedUser = await db.user.update({
       where: { email: session.user.email },
       data: {
         name,
         image,
+        phoneNumber,
+        dexp,
+        rexp,
       },
       select: {
         id: true,
         name: true,
         email: true,
         image: true,
+        phoneNumber: true,
+        dexp: true,
+        rexp: true,
       },
     })
 

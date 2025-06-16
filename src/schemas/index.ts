@@ -107,7 +107,15 @@ export const ProfileSchema = z.object({
   name: z
     .string()
     .min(3, { message: 'Name must be at least 3 characters' })
-    .max(30, { message: 'Name cannot be more than 30 characters' })
+    .max(15, { message: 'Name cannot be more than 15 characters' })
     .nonempty({ message: 'Name is required' }),
-  imgUrl: z.string().optional().nullable(),
+  phoneNumber: z
+    .string()
+    .min(10, { message: 'Phone number must be at least 10 digits' })
+    .max(15, { message: 'Phone number cannot be more than 15 digits' })
+    .optional()
+    .nullable(),
+  image: z.string().optional().nullable(),
+  dexp: z.string().optional().nullable(),
+  rexp: z.string().optional().nullable(),
 })

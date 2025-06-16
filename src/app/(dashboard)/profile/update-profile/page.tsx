@@ -6,20 +6,21 @@ import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '@/components/shared/error-state'
 
 const UpdateProfile = () => {
-  const { data, isLoading, isError, error } = useGetProfile()
+  const { data, isError, error } = useGetProfile()
 
   useToast({
     isError,
     errorMsg: error?.message,
-    isLoading,
   })
 
   if (isError || !data)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   return (
-    <div className='p-6 max-w-4xl'>
-      <h2 className='text-2xl font-bold mb-4'>Edit Profile</h2>
+    <div className='mx-auto space-y-5 sm:space-y-10'>
+      <div className='mb-5 sm:mb-10'>
+        <span className='text-2xl font-bold'>Update Your Profile</span>
+      </div>
       <ProfileForm defaultValues={data} />
     </div>
   )

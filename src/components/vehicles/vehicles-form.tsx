@@ -1,5 +1,7 @@
 'use client'
 
+import { useFileUpload } from '@/hooks/fileUpload/use-file-upload'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { VehicleSchema } from '@/schemas'
@@ -36,7 +38,9 @@ const VehicleForm = ({
 }: {
   defaultValues?: Partial<z.infer<typeof VehicleSchema>> & { id?: string }
 }) => {
-  const route = useRouter();
+  const route = useRouter()
+
+  const { upload, isUploading, error: uploadError } = useFileUpload()
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -76,7 +80,7 @@ const VehicleForm = ({
     onSuccess: () => {
       setSuccess('Vehicle updated successfully')
       setError('')
-      route.push('/vehicles');
+      route.push('/vehicles')
     },
     onError: (err: Error) => {
       setError(err.message)
@@ -84,12 +88,19 @@ const VehicleForm = ({
     },
   })
 
-  const onSubmit = (values: z.infer<typeof VehicleSchema>) => {
+  const onSubmit = async (values: z.infer<typeof VehicleSchema>) => {
+    let imgUrl = defaultValues?.imgUrl ?? ''
+
+    if (selectedImage) {
+      const publicId = defaultValues?.id ?? Date.now().toString()
+      const type = 'vehicles'
+      const uploaded = await upload(selectedImage, type, publicId)
+      imgUrl = uploaded ?? ''
+    }
+
     const payload = {
       ...values,
-      imgUrl: selectedImage
-        ? URL.createObjectURL(selectedImage)
-        : defaultValues?.imgUrl ?? '',
+      imgUrl,
     }
 
     if (defaultValues?.id) {
@@ -105,7 +116,8 @@ const VehicleForm = ({
     }
   }, [defaultValues, form])
 
-  const isPending = createMutation.isPending || updateMutation.isPending
+  const isPending =
+    createMutation.isPending || updateMutation.isPending || isUploading
 
   return (
     <div className='p-6 max-w-6xl'>
@@ -343,6 +355,9 @@ const VehicleForm = ({
             {error && (
               <p className='text-sm text-red-500 font-medium'>{error}</p>
             )}
+            {uploadError && (
+              <p className='text-sm text-red-500 font-medium'>{uploadError}</p>
+            )}
             {success && (
               <p className='text-sm text-green-600 font-medium'>{success}</p>
             )}
@@ -353,8 +368,12 @@ const VehicleForm = ({
                 disabled={isPending}
               >
                 {isPending
-                  ? defaultValues?.id ? 'Updating...' : 'Adding...'
-                  : defaultValues?.id ? 'Update Vehicle' : 'Add Vehicle'}
+                  ? defaultValues?.id
+                    ? 'Updating...'
+                    : 'Adding...'
+                  : defaultValues?.id
+                  ? 'Update Vehicle'
+                  : 'Add Vehicle'}
               </Button>
             </div>
           </div>

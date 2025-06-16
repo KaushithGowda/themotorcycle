@@ -34,8 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  adapter: PrismaAdapter(db as any),
+  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   ...authConfig,
 })

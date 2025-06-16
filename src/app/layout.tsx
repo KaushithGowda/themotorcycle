@@ -12,6 +12,14 @@ import { Separator } from '@/components/ui/separator'
 import { auth } from '@/auth'
 import GlobalLoadingClient from '@/components/shared/global-client-loader'
 import { Toaster } from 'react-hot-toast'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -59,21 +67,21 @@ export default async function RootLayout({
                       orientation='vertical'
                       className='mr-2 data-[orientation=vertical]:h-4'
                     />
-                    {/* <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb> */}
+                    <Breadcrumb>
+                      <BreadcrumbList>
+                        <BreadcrumbItem className='hidden md:block'>
+                          <BreadcrumbLink href='/'>
+                            Home
+                          </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className='hidden md:block' />
+                        <BreadcrumbItem>
+                          <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                        </BreadcrumbItem>
+                      </BreadcrumbList>
+                    </Breadcrumb>
                   </header>
-                  <div className='px-2 py-5 sm:px-5 sm:py-5'>{children}</div>
+                  <div className='px-4 py-5 sm:px-5 sm:py-5'>{children}</div>
                 </SidebarInset>
               </SidebarProvider>
             </div>

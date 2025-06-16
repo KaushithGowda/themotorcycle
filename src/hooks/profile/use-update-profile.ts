@@ -4,7 +4,10 @@ import { axiosInstance } from '@/lib/api/axios'
 
 type UpdateProfileInput = {
   name: string
-  imgUrl?: string | File | null
+  image?: string | File | null
+  phoneNumber?: string
+  dexp?: string
+  rexp?: string
 }
 
 export const useUpdateProfile = ({
@@ -19,9 +22,24 @@ export const useUpdateProfile = ({
   return useMutation({
     mutationFn: async (values: UpdateProfileInput) => {
       const formData = new FormData()
-      formData.append('name', values.name)
-      if (values.imgUrl && typeof values.imgUrl !== 'string') {
-        formData.append('imgUrl', values.imgUrl)
+      formData.append('name', values.name)    
+      console.log({values});
+        
+      if (values.phoneNumber) {
+        formData.append('phoneNumber', values.phoneNumber)
+      }
+      if (values.dexp) {
+        formData.append('dexp', values.dexp)
+      }
+      if (values.rexp) {
+        formData.append('rexp', values.rexp)
+      }
+      if (values.image && typeof values.image === 'string') {
+        formData.append('image', values.image)
+      }
+
+      for (const [key,value] of formData) {
+        console.log(key, value);
       }
 
       const res = await axiosInstance.patch('/api/profile', formData)

@@ -116,11 +116,9 @@ export const VehicleList = () => {
           </div>
         </Card>
       ))}
-      <Link href='/vehicles/new'>
-        <Card className='w-72 min-h-[350px] rounded-2xl overflow-hidden flex items-center justify-center border-dashed border-2 border-primary text-primary hover:bg-muted transition'>
-          <span className='text-9xl'>+</span>
-        </Card>
-      </Link>
+      <Button variant={'secondary'} asChild className='h-20 w-20 flex items-center justify-center'>
+        <Link href='/vehicles/new' className='font-extrabold text-xl'>+</Link>
+      </Button>
     </div>
   )
 }
