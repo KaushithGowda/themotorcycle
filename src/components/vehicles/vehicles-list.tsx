@@ -7,10 +7,15 @@ import { Separator } from '@/components/ui/separator'
 import OdoMeter from '@/components/vehicles/odo-meter'
 import RegNumber from './reg-number'
 import { Button } from '../ui/button'
-import { FaLongArrowAltRight, FaPen } from 'react-icons/fa'
+import {
+  FaCarSide,
+  FaLongArrowAltRight,
+  FaMotorcycle,
+} from 'react-icons/fa'
 import Link from 'next/link'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '../shared/error-state'
+import { MdEdit } from 'react-icons/md'
 
 export const VehicleList = () => {
   const { data: vehicles, isLoading, isError, error } = useGetVehicles()
@@ -42,82 +47,95 @@ export const VehicleList = () => {
   }
 
   return (
-    <div className='flex flex-wrap gap-5'>
-      {vehicles.map((vehicle) => (
-        <Card
-          key={vehicle.id}
-          className='relative w-72 min-h-[350px] py-0 rounded-2xl overflow-hidden shadow-lg border'
-        >
-          <Button
-            asChild
-            variant='secondary'
-            size='icon'
-            className='absolute top-2 right-2 z-10 p-1 cursor-pointer'
+    <div className='flex flex-wrap justify-center sm:justify-start gap-5'>
+      {vehicles?.map((vehicle) => {
+        return (
+          <Card
+            key={vehicle.id}
+            className='relative w-72 min-h-[350px] py-0 rounded-2xl overflow-hidden shadow-lg border'
           >
-            <Link href={`/vehicles/${vehicle.id}`}>
-              <FaPen size={18} />
-            </Link>
-          </Button>
-          {vehicle.imgUrl || (
+            <Button
+              asChild
+              variant='secondary'
+              className='absolute top-2 right-2 z-10 cursor-pointer'
+            >
+              <Link href={`/vehicles/${vehicle.id}`}>
+                Edit
+                <MdEdit />
+              </Link>
+            </Button>
             <div className='h-40 w-full relative'>
               <ImageWithFallback
-                src={'/uploads/porsche.jpg'}
-                alt={vehicle.make}
+                loading='lazy'
+                src={vehicle?.image || '/uploads/image-not-found.jpg'}
+                alt={`${vehicle.make} ${vehicle.model}` || 'Vehicle Image'}
                 fill
                 className='object-cover'
               />
             </div>
-          )}
-          <div className='px-4 pb-4'>
-            <div className='flex justify-between items-center'>
-              <div>
-                <span className='font-extrabold text-lg text-primary capitalize'>
-                  {vehicle.model}
-                </span>
-                <div className='flex items-center gap-2'>
-                  <span className='text-muted-foreground  uppercase text-xs'>
-                    {vehicle.make}
+            <div className='px-4 pb-4'>
+              <div className='flex justify-between items-center'>
+                <div>
+                  <span className='font-extrabold text-lg text-primary capitalize'>
+                    {vehicle.model}
                   </span>
-                  <Separator
-                    orientation='vertical'
-                    className='data-[orientation=vertical]:h-4'
-                  />
-                  <span className='text-muted-foreground uppercase text-xs '>
-                    {vehicle.color}
-                  </span>
-                  <Separator
-                    orientation='vertical'
-                    className='data-[orientation=vertical]:h-4'
-                  />
-                  <span className='text-muted-foreground uppercase text-xs '>
-                    {vehicle.dateOfReg}
-                  </span>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-muted-foreground  uppercase text-xs'>
+                      {vehicle.make}
+                    </span>
+                    <Separator
+                      orientation='vertical'
+                      className='data-[orientation=vertical]:h-4'
+                    />
+                    <span className='text-muted-foreground uppercase text-xs '>
+                      {vehicle.color}
+                    </span>
+                    <Separator
+                      orientation='vertical'
+                      className='data-[orientation=vertical]:h-4'
+                    />
+                    <span className='text-muted-foreground uppercase text-xs '>
+                      {(() => {
+                        const regDate = new Date(vehicle.dateOfReg)
+                        const now = new Date()
+                        const diffInMs = now.getTime() - regDate.getTime()
+                        const diffInMonths =
+                          diffInMs / (1000 * 60 * 60 * 24 * 30.44)
+                        const years = Math.floor(diffInMonths / 12)
+                        return years >= 1
+                          ? `${years} yr${years > 1 ? 's' : ''}`
+                          : ''
+                      })()}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <Button
+                    asChild
+                    className='uppercase cursor-pointer'
+                    variant={'secondary'}
+                  >
+                    <Link href={`/vehicles/${vehicle.id}/parts`}>
+                      go
+                      <FaLongArrowAltRight />
+                    </Link>
+                  </Button>
                 </div>
               </div>
-              <div>
-                <Button
-                  asChild
-                  className='uppercase cursor-pointer'
-                  variant={'secondary'}
-                >
-                  <Link href={`/vehicles/${vehicle.id}/parts`}>
-                    go
-                    <FaLongArrowAltRight />
-                  </Link>
-                </Button>
+              <div className='my-2'>
+                <RegNumber />
+              </div>
+              <div className='my-2'>
+                <OdoMeter odoReading={vehicle.odoReading} />
               </div>
             </div>
-            <div className='my-2'>
-              <RegNumber />
-            </div>
-            <div className='my-2'>
-              <OdoMeter odoReading={vehicle.odoReading} />
-            </div>
-          </div>
-        </Card>
-      ))}
-      <Button variant={'secondary'} asChild className='h-20 w-20 flex items-center justify-center'>
-        <Link href='/vehicles/new' className='font-extrabold text-xl'>+</Link>
+          </Card>
+        )
+      })}
+      <Button variant={'secondary'} asChild className='sm:py-10'>
+        <Link href='/vehicles/new' className='font-extrabold'>
+          + Add <FaMotorcycle /> / <FaCarSide />
+        </Link>
       </Button>
     </div>
   )

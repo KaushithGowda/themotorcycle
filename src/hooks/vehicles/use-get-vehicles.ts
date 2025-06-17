@@ -9,7 +9,7 @@ type Vehicle = {
   dateOfReg: string
   odoReading: number
   regNumber: string
-  imgUrl: string | null
+  image: string | null
   createdAt: string
   cubicCapacity?: string
   horsePower?: string

@@ -4,12 +4,13 @@
  * @type {string[]}
  */
 export const publicRoutes: string[] = [
-    '/'
+    // '/auth',
+    // '/auth/error'
 ]
 
 /**
  * Array of routes used for aunthentication
- * These routes will redirect logged in users to /settings page
+ * These routes will redirect logged in users to dashboard i.e '/'
  * @type {string[]}
  */
 export const authRoutes: string[] = [
