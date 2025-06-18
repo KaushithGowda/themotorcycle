@@ -79,18 +79,21 @@ export const VehicleSchema = z.object({
       message: 'Invalid registration date',
     }),
   odoReading: z
-    .number()
+    .string()
     .min(0, { message: 'Odometer must be at least 0' })
-    .max(9999999, { message: 'Odometer cannot exceed 7 digits' }),
+    .max(9999999, { message: 'Odometer cannot exceed 7 digits' })
+    .nonempty({ message: 'Odometer reading is required' }),
   regNumber: z
     .string()
     .min(5, { message: 'Register number must be at least 5 characters' })
     .max(10, { message: 'Register number cannot be more than 10 characters' })
     .nonempty({ message: 'Register number is required' }),
-  imgUrl: z.string().optional().nullable(),
-  cubicCapacity: z.string().optional(),
-  horsePower: z.string().optional(),
-  torque: z.string().optional(),
+  image: z.string().optional().nullable(),
+  coverImage: z.string().optional().nullable(),
+  cubicCapacity: z.string().optional().nullable(),
+  horsePower: z.string().optional().nullable(),
+  torque: z.string().optional().nullable(),
+  kerbWeight: z.string().optional().nullable(),
 })
 
 export const PartSchema = z.object({

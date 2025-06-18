@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { VehicleSchema } from '@/schemas'
 import { z } from 'zod'
@@ -19,35 +18,14 @@ export const useUpdateVehicle = ({
 
   return useMutation({
     mutationFn: async ({ vehicleId, ...values }: UpdateVehicleProps) => {
-      const formData = new FormData()
-
-      Object.entries(values).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (
-            typeof File !== 'undefined' &&
-            typeof value === 'object'
-          ) {
-            formData.append(key, value)
-          } else if (value !== '') {
-            formData.append(key, String(value))
-          }
-        }
-      })
-
       const res = await axiosInstance.patch(
         `/api/vehicles/${vehicleId}`,
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        }
+        values
       )
       return res.data
     },
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: ['vehicle', variables.vehicleId],
-      })
-      await queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: ['vehicle', variables.vehicleId],
       })
       onSuccess()

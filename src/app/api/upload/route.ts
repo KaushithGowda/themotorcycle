@@ -13,7 +13,6 @@ cloudinary.config({
 
 export async function POST(req: Request) {
   try {
-    console.log(req.headers.get('content-type'))
     const uploadDir = path.join(process.cwd(), 'public', 'uploads')
     await fs.mkdir(uploadDir, { recursive: true })
 
@@ -49,9 +48,6 @@ export async function POST(req: Request) {
       method: req.method,
       url: '',
     })
-
-    // Import IncomingMessage from 'http' at the top of your file:
-    // import { IncomingMessage } from 'http';
 
     const [fields, files] = await new Promise<[formidable.Fields, formidable.Files]>((resolve, reject) => {
       form.parse(reqNodeCompatible as unknown as import('http').IncomingMessage, (err, fields, files) => {

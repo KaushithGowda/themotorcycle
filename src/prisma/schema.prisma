@@ -71,11 +71,13 @@ model Vehicle {
   cubicCapacity String?
   horsePower    String?
   torque        String?
+  kerbWeight    String?
   color      String
   dateOfReg  String
   odoReading String
   regNumber  String
-  imgUrl     String?
+  image     String?
+  coverImage     String?
   createdAt  DateTime @default(now())
 
   userId                   String

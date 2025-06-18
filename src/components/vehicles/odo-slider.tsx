@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/dialog'
 
 interface OdoSliderProps {
-  value: number
-  onChange: (value: number) => void
+  value: string
+  onChange: (value: string) => void
 }
 
 const OdoSlider = ({ value, onChange }: OdoSliderProps) => {
@@ -33,14 +33,14 @@ const OdoSlider = ({ value, onChange }: OdoSliderProps) => {
 
   const handleChange = (value: Record<string, string>) => {
     const joined = Object.values(value).join('')
-    setTempValue(Number(joined))
+    setTempValue(joined)
   }
 
   return (
     <div className='space-y-2'>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild className='w-full'>
-          <Button variant='secondary' className='uppercase'>
+          <Button variant='secondary' className='uppercase cursor-pointer'>
             {tempValue} kms
           </Button>
         </DialogTrigger>

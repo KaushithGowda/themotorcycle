@@ -9,13 +9,15 @@ import RegNumber from './reg-number'
 import { Button } from '../ui/button'
 import {
   FaCarSide,
-  FaLongArrowAltRight,
   FaMotorcycle,
 } from 'react-icons/fa'
 import Link from 'next/link'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '../shared/error-state'
-import { MdEdit } from 'react-icons/md'
+import { TiSpanner } from "react-icons/ti";
+import { ColorBadge } from './color-badge'
+import { Vehicle } from '@/types/vehicle'
+import { MdHealthAndSafety } from 'react-icons/md'
 
 export const VehicleList = () => {
   const { data: vehicles, isLoading, isError, error } = useGetVehicles()
@@ -48,7 +50,7 @@ export const VehicleList = () => {
 
   return (
     <div className='flex flex-wrap justify-center sm:justify-start gap-5'>
-      {vehicles?.map((vehicle) => {
+      {vehicles?.map((vehicle: Vehicle) => {
         return (
           <Card
             key={vehicle.id}
@@ -60,8 +62,7 @@ export const VehicleList = () => {
               className='absolute top-2 right-2 z-10 cursor-pointer'
             >
               <Link href={`/vehicles/${vehicle.id}`}>
-                Edit
-                <MdEdit />
+                <TiSpanner />
               </Link>
             </Button>
             <div className='h-40 w-full relative'>
@@ -79,16 +80,18 @@ export const VehicleList = () => {
                   <span className='font-extrabold text-lg text-primary capitalize'>
                     {vehicle.model}
                   </span>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-muted-foreground  uppercase text-xs'>
-                      {vehicle.make}
+                  <div className='flex items-center gap-1'>
+                    <span className='text-muted-foreground uppercase text-xs'>
+                      {vehicle.make.length > 12
+                        ? `${vehicle.make.slice(0, 9)}...`
+                        : vehicle.make}
                     </span>
                     <Separator
                       orientation='vertical'
                       className='data-[orientation=vertical]:h-4'
                     />
                     <span className='text-muted-foreground uppercase text-xs '>
-                      {vehicle.color}
+                      <ColorBadge color={vehicle?.color}/>
                     </span>
                     <Separator
                       orientation='vertical'
@@ -109,18 +112,16 @@ export const VehicleList = () => {
                     </span>
                   </div>
                 </div>
-                <div>
                   <Button
                     asChild
                     className='uppercase cursor-pointer'
-                    variant={'secondary'}
+                    variant={'default'}
                   >
-                    <Link href={`/vehicles/${vehicle.id}/parts`}>
-                      go
-                      <FaLongArrowAltRight />
+                    <Link className='' href={`/vehicles/${vehicle.id}/parts`}>
+                      Check
+                      <MdHealthAndSafety color='red'/>
                     </Link>
                   </Button>
-                </div>
               </div>
               <div className='my-2'>
                 <RegNumber />

@@ -1,14 +1,14 @@
-type odoMeterType = {
-  odoReading: number
+type OdoMeterProps = {
+  odoReading: string
 }
 
-const OdoMeter = ({ odoReading }: odoMeterType) => {
-  const odo = odoReading.toString().padStart(7, '0').split('')
+const OdoMeter: React.FC<OdoMeterProps> = ({ odoReading }) => {
+  const digits = odoReading.padStart(7, '0').split('')
 
   return (
     <div className='bg-gray-100 dark:bg-[#1c1c1c] rounded-md border border-gray-300 dark:border-gray-700 shadow-lg flex px-2 py-2 justify-between'>
       <div className='flex space-x-1'>
-        {odo.map((digit, index) => (
+        {digits.map((digit, index) => (
           <div key={index} className='flex items-center space-x-1'>
             <div className='bg-gray-200 dark:bg-gray-700 text-black dark:text-white text-sm w-5 h-8 flex items-center justify-center font-mono border border-gray-400 dark:border-gray-700 rounded-sm'>
               {digit}

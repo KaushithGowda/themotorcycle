@@ -11,12 +11,11 @@ const EditVehicle = () => {
   const params = useParams()
   const vehicleId = params?.vehicleId as string
 
-  const { data: vehicle, isLoading, isError, error } = useVehicleById(vehicleId)
+  const { data: vehicle, isError, error } = useVehicleById(vehicleId)
 
   useToast({
     isError,
     errorMsg: error?.message,
-    isLoading,
   })
 
   if (!vehicle && !isError) return <EmptyState heading='Vehicle not found' message='No vehicle data available for this ID.' />
@@ -24,11 +23,7 @@ const EditVehicle = () => {
   if (isError || !vehicle)
     return <ErrorState heading={error?.name} message={error?.message} />
 
-  return (
-    <div className='w-full flex justify-center flex-col'>
-      <VehicleForm defaultValues={vehicle} />
-    </div>
-  )
+  return <VehicleForm defaultValues={vehicle} />
 }
 
 export default EditVehicle

@@ -8,5 +8,6 @@ export const useVehicleById = (id: string) => {
       const res = await axiosInstance.get(`/api/vehicles/${id}`)
       return res.data
     },
+    enabled: !!id
   })
 }
