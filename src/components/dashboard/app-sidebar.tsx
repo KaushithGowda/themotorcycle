@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <Link href='/' className='flex items-center gap-1 p-2'>
           <span className='text-base capitalize font-semibold tracking-wide'>
-            garage
+           the garage
           </span>
           <TiSpanner />
         </Link>
