@@ -132,7 +132,7 @@ const ProfileForm = ({
                     />
                   ) : (
                     <Image
-                      src={form.watch('image') || '/fallback.png'}
+                      src={form.watch('image') || '/uploads/user-not-found.png'}
                       alt='profile'
                       fill
                       className='object-cover'
