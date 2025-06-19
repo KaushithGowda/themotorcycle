@@ -1,5 +1,11 @@
-import { axiosInstance } from "@/lib/api/axios"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { axiosInstance } from '@/lib/api/axios'
+import { PartSchema } from '@/schemas'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { z } from 'zod'
+
+type UpdatePartsProps = {
+  vehicleId: string
+} & z.infer<typeof PartSchema>
 
 // Create part
 export const useCreatePart = ({
@@ -11,21 +17,15 @@ export const useCreatePart = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (values: { vehicleId: string; [key: string]: unknown }) => {
-      const formData = new FormData()
-      const { vehicleId, ...rest } = values
-      console.log({vehicleId});
-      
-      Object.entries(rest).forEach(([key, val]) => {
-        if (val !== undefined && val !== null) {
-          formData.append(key, String(val))
-        }
-      })
-      const res = await axiosInstance.post(`/api/vehicles/${vehicleId}/parts`, formData)
+    mutationFn: async ({ vehicleId, ...values }: UpdatePartsProps) => {
+      const res = await axiosInstance.post(
+        `/api/vehicles/${vehicleId}/parts`,
+        values
+      )
       return res.data
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['parts'] })
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['part', variables.vehicleId] })
       onSuccess()
     },
     onError: (err) => {

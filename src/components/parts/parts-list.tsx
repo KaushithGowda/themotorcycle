@@ -3,78 +3,91 @@
 import { useGetParts } from '@/hooks/parts/use-get-parts'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { FaPen } from 'react-icons/fa'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '../shared/error-state'
 import Image from 'next/image'
 import { Progress } from '@/components/ui/progress'
+import { Part } from '@/types/part'
+import { ImageWithFallback } from '../utils/ImageWithFallback'
+import { TiSpanner } from 'react-icons/ti'
+import { EmptyState } from '../shared/empty-state'
 
 export const PartsList = () => {
   const { vehicleId } = useParams()
-  console.log({ vehicleId })
 
   const {
     data: parts,
-    isLoading,
     isError,
     error,
-  } = useGetParts(String(vehicleId ?? ''))
+  } = useGetParts(typeof vehicleId === 'string' ? vehicleId : '')
 
   useToast({
     isError,
     errorMsg: error?.message,
-    isLoading,
   })
+
+  if (!parts && !isError) return <EmptyState heading='Parts not found!' message='Parts data not found' />
+
+  if (isError)
+    return <ErrorState heading={error?.name} message={error?.message} />
 
   return (
     <>
-      <div className='flex flex-col'>
-        <div className='relative w-full h-60'>
-          <Image
-            src='/uploads/cover-placeholder.jpg'
-            alt='Cover'
-            className='w-full h-full object-cover rounded-xl'
-            width={112}
-            height={112}
+      <div className='relative w-full h-70'>
+        <div className='relative overflow-hidden w-full h-60 rounded-xl'>
+          <ImageWithFallback
+            src={
+              (parts && parts[0]?.vehicle?.coverImage) ??
+              '/uploads/motorcycle-cover-photo.png'
+            }
+            priority
+            alt='cover'
+            fill
+            className='object-cover border-2 rounded-xl w-full max-h-full max-w-full'
           />
-          <div className='absolute top-44 left-5 flex flex-col items-center'>
+        </div>
+        <div className='absolute left-5 top-[60%] cursor-pointer flex justify-center items-center'>
+          <div className='flex flex-col gap-2'>
             <Image
-              src='/uploads/cover-placeholder.jpg'
+              src={
+                (parts && parts[0]?.vehicle?.image) ??
+                '/uploads/motorcycle-photo.png'
+              }
               alt='Vehicle'
               width={100}
               height={100}
-              className='w-28 h-28 rounded-full border-4 border-background object-cover'
               priority
+              className='w-28 h-28 rounded-full object-cover bg-white dark:bg-black border-2'
             />
             <div>
               <h2 className='text-sm font-bold'>Alto</h2>
-              <p className='text-muted-foreground font-mono text-xs'>Maruti Suzuki</p>
+              <p className='text-muted-foreground font-mono text-xs'>
+                Maruti Suzuki
+              </p>
             </div>
           </div>
         </div>
       </div>
-      <div className='mt-32'>
-        {isError && (
-          <ErrorState heading={error?.name} message={error?.message} />
-        )}
+      <div className='mt-24'>
+        {!parts ||
+          (parts.length === 0 && (
+            <div className='flex flex-col items-center justify-center min-h-fit text-center space-y-6 w-full'>
+              <h1 className='text-3xl font-bold'>No Parts Added Yet</h1>
+              <p className='text-muted-foreground text-lg'>
+                Keep track of all parts used on your vehicles
+              </p>
+              <Button asChild>
+                <Link href={`/vehicles/${vehicleId}/parts/new`}>Add Part</Link>
+              </Button>
+            </div>
+          ))}
 
-        {!isError && (!parts || parts.length === 0) && (
-          <div className='flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 w-full'>
-            <h1 className='text-3xl font-bold'>No Parts Added Yet</h1>
-            <p className='text-muted-foreground text-lg'>
-              Keep track of all parts used on your vehicles
-            </p>
-            <Button asChild>
-              <Link href={`/vehicles/${vehicleId}/parts/new`}>Add Part</Link>
-            </Button>
-          </div>
-        )}
-
-        {!isError && parts && parts.length > 0 && (
+        {parts && parts.length > 0 && (
           <div className='flex flex-wrap gap-5'>
-            {parts.map((part) => {
+            {parts.map((part: Part) => {
+
               const startDate = new Date(part.startDate)
               const endDate = new Date(part.endDate)
               const today = new Date()
@@ -99,30 +112,30 @@ export const PartsList = () => {
                 >
                   <div className='relative h-36 bg-muted'>
                     <Image
-                      src='/uploads/porsche.jpg'
-                      alt={part.name}
-                      layout='fill'
-                      objectFit='cover'
-                      className='rounded-t-2xl'
+                      src={part?.image ?? '/uploads/car-photo.png'}
+                      alt={part?.partName || 'part-image'}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 300px"
+                      priority={false}
+                      className='rounded-t-2xl object-cover'
                     />
                     <Button
                       asChild
                       variant='secondary'
-                      size='icon'
-                      className='absolute top-2 right-2 z-10 p-1 cursor-pointer'
+                      className='absolute top-2 right-2 z-10 cursor-pointer'
                     >
                       <Link href={`/vehicles/${vehicleId}/parts/${part.id}`}>
-                        <FaPen size={16} />
+                        <TiSpanner/>
                       </Link>
                     </Button>
                   </div>
                   <div className='px-4 py-2 space-y-2'>
                     <div className='flex flex-col'>
                       <h3 className='font-bold text-lg capitalize'>
-                        {part.name || 'Name'}
+                        {part.partName || 'Name'}
                       </h3>
                       <span className='text-xs text-muted-foreground font-mono'>
-                        {part.partNumber}
+                        {part?.partNumber}
                       </span>
                     </div>
 
@@ -152,11 +165,16 @@ export const PartsList = () => {
                         {part.startOdo} → {part.endOdo}
                       </p>
                       <Progress
-                        value={(Number(part.startOdo) / Number(part.endOdo)) * 100}
-                        className={`h-2 ${ 
-                          (Number(part.startOdo) / Number(part.endOdo)) * 100 <= 35
+                        value={
+                          (Number(part.startOdo) / Number(part.endOdo)) * 100
+                        }
+                        className={`h-2 ${
+                          (Number(part.startOdo) / Number(part.endOdo)) * 100 <=
+                          35
                             ? '[&>div]:bg-destructive'
-                            : (Number(part.startOdo) / Number(part.endOdo)) * 100 <= 60
+                            : (Number(part.startOdo) / Number(part.endOdo)) *
+                                100 <=
+                              60
                             ? '[&>div]:bg-yellow-500'
                             : '[&>div]:bg-green-600'
                         }`}
@@ -165,19 +183,6 @@ export const PartsList = () => {
                         {Number(part.endOdo) - Number(part.startOdo)} kms left
                       </p>
                     </div>
-
-                    {/* <div className='pt-2'>
-                      <Button
-                        asChild
-                        variant='link'
-                        className='text-primary p-0 text-xs'
-                      >
-                        <Link href={`/parts/${part.id}`}>
-                          View Details{' '}
-                          <FaLongArrowAltRight className='ml-1 inline-block' />
-                        </Link>
-                      </Button>
-                    </div> */}
                   </div>
                 </Card>
               )
@@ -187,8 +192,8 @@ export const PartsList = () => {
               asChild
               className='h-20 w-20 flex items-center justify-center'
             >
-              <Link href='/parts/new' className='font-extrabold text-xl'>
-                +
+              <Link href={`/vehicles/${vehicleId}/parts/new`} className='font-extrabold text-xs'>  
+                + Add Part
               </Link>
             </Button>
           </div>

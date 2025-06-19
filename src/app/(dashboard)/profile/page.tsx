@@ -18,6 +18,7 @@ import { useGetProfile } from '@/hooks/profile/use-get-profile'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '@/components/shared/error-state'
 import Link from 'next/link'
+import { EmptyState } from '@/components/shared/empty-state'
 
 const Profile = () => {
   const mode = usePreferenceStore((state) => state.mode)
@@ -54,7 +55,9 @@ const Profile = () => {
     errorMsg: error?.message,
   })
 
-  if (isError || !user)
+  if (!user && !isError) return <EmptyState heading='Data not found!' message='User data not found' />
+
+  if (isError)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   return (
@@ -66,9 +69,9 @@ const Profile = () => {
               <ImageWithFallback
                 src={user?.image || '/uploads/user-not-found.png'}
                 alt='Profile Picture'
-                width={48}
-                height={48}
-                className='rounded-full object-cover border'
+                width={60}
+                height={60}
+                className='rounded-full border aspect-square object-cover'
               />
               <div>
                 <span className='text-sm sm:text-lg font-bold leading-tight capitalize'>

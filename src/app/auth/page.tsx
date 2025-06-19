@@ -16,7 +16,7 @@ const Auth = () => {
           {ui === 'login' ? <LoginForm setUi={setUi}/> : <RegisterForm setUi={setUi}/>}
           <div className='bg-muted relative hidden md:block'>
             <Image
-              src='/uploads/themotorcycle.png'
+              src='/uploads/motorcycle-photo.png'
               alt='Image'
               height={100}
               width={100}

@@ -18,9 +18,9 @@ const EditVehicle = () => {
     errorMsg: error?.message,
   })
 
-  if (!vehicle && !isError) return <EmptyState heading='Vehicle not found' message='No vehicle data available for this ID.' />
+  if (!vehicle && !isError) return <EmptyState heading='Vehicle not found' message='No vehicle data available for this vehicle' />
 
-  if (isError || !vehicle)
+  if (isError)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   return <VehicleForm defaultValues={vehicle} />

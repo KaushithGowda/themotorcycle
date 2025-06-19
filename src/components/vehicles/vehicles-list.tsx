@@ -7,34 +7,36 @@ import { Separator } from '@/components/ui/separator'
 import OdoMeter from '@/components/vehicles/odo-meter'
 import RegNumber from './reg-number'
 import { Button } from '../ui/button'
-import {
-  FaCarSide,
-  FaMotorcycle,
-} from 'react-icons/fa'
+import { FaCarSide, FaMotorcycle } from 'react-icons/fa'
 import Link from 'next/link'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '../shared/error-state'
-import { TiSpanner } from "react-icons/ti";
+import { TiSpanner } from 'react-icons/ti'
 import { ColorBadge } from './color-badge'
 import { Vehicle } from '@/types/vehicle'
 import { MdHealthAndSafety } from 'react-icons/md'
+import { EmptyState } from '../shared/empty-state'
 
 export const VehicleList = () => {
-  const { data: vehicles, isLoading, isError, error } = useGetVehicles()
+  const { data: vehicles, isError, error } = useGetVehicles()
 
   useToast({
     isError,
     errorMsg: error?.message,
-    isLoading,
   })
 
-  if (isError || !vehicles)
+  if (!vehicles && !isError)
+    return (
+      <EmptyState heading='Vehicles not found!' message='Vehicles data not found' />
+    )
+
+  if (isError)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   if (!vehicles || vehicles.length === 0) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 w-full'>
-        <h1 className='text-3xl font-bold'>Welcome to Your Garage</h1>
+        <h1 className='text-3xl font-bold'>Welcome to Garage</h1>
         <p className='text-muted-foreground text-lg'>
           A place where we look after your vehicles
         </p>
@@ -50,7 +52,7 @@ export const VehicleList = () => {
 
   return (
     <div className='flex flex-wrap justify-center sm:justify-start gap-5'>
-      {vehicles?.map((vehicle: Vehicle) => {
+      {vehicles?.map((vehicle: Vehicle,index: number) => {
         return (
           <Card
             key={vehicle.id}
@@ -62,15 +64,16 @@ export const VehicleList = () => {
               className='absolute top-2 right-2 z-10 cursor-pointer'
             >
               <Link href={`/vehicles/${vehicle.id}`}>
-                <TiSpanner />
+                <TiSpanner size={50} />
               </Link>
             </Button>
             <div className='h-40 w-full relative'>
               <ImageWithFallback
-                loading='lazy'
-                src={vehicle?.image || '/uploads/image-not-found.jpg'}
+                src={vehicle?.image || '/uploads/car-photo.jpg'}
                 alt={`${vehicle.make} ${vehicle.model}` || 'Vehicle Image'}
                 fill
+                sizes='100'
+                priority={index === 0}
                 className='object-cover'
               />
             </div>
@@ -91,7 +94,7 @@ export const VehicleList = () => {
                       className='data-[orientation=vertical]:h-4'
                     />
                     <span className='text-muted-foreground uppercase text-xs '>
-                      <ColorBadge color={vehicle?.color}/>
+                      <ColorBadge color={vehicle?.color} />
                     </span>
                     <Separator
                       orientation='vertical'
@@ -112,16 +115,16 @@ export const VehicleList = () => {
                     </span>
                   </div>
                 </div>
-                  <Button
-                    asChild
-                    className='uppercase cursor-pointer'
-                    variant={'default'}
-                  >
-                    <Link className='' href={`/vehicles/${vehicle.id}/parts`}>
-                      Check
-                      <MdHealthAndSafety color='red'/>
-                    </Link>
-                  </Button>
+                <Button
+                  asChild
+                  className='uppercase cursor-pointer'
+                  variant={'secondary'}
+                >
+                  <Link className='' href={`/vehicles/${vehicle.id}/parts`}>
+                    Check
+                    <MdHealthAndSafety color='red' />
+                  </Link>
+                </Button>
               </div>
               <div className='my-2'>
                 <RegNumber />

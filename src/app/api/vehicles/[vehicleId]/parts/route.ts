@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
+import { PartSchema } from '@/schemas'
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -18,15 +19,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const {
-      partName,
-      partNumber,
-      startOdo,
-      endOdo,
-      startDate,
-      endDate,
-      imgUrl,
-    } = body
+    const result = PartSchema.safeParse(body)
+
+    if(!result.success) return NextResponse.json(
+        { error: 'Invalid part data' },
+        { status: 400 }
+      )
+
+    const validatedData = result.data
+    console.log({body},{result},{validatedData});
 
     const vehicle = await db.vehicle.findUnique({
       where: { id: vehicleId },
@@ -38,14 +39,8 @@ export async function POST(request: NextRequest) {
 
     const part = await db.part.create({
       data: {
-        partName,
-        partNumber,
-        startOdo,
-        endOdo,
-        startDate,
-        endDate,
-        imgUrl,
         vehicleId,
+        ...validatedData
       },
     })
 
@@ -74,6 +69,16 @@ export async function GET(request: NextRequest) {
     const parts = await db.part.findMany({
       where: { vehicleId },
       orderBy: { createdAt: 'desc' },
+      include: {
+        vehicle: {
+          select: {
+            make: true,
+            model: true,
+            image: true,
+            coverImage: true,
+          },
+        },
+      },
     })
 
     return NextResponse.json({ parts }, { status: 200 })

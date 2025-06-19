@@ -96,15 +96,30 @@ export const VehicleSchema = z.object({
   kerbWeight: z.string().optional().nullable(),
 })
 
-export const PartSchema = z.object({
-  partName: z.string().min(1, { message: 'Part name is required' }),
-  partNumber: z.string().min(1, { message: 'Part number is required' }),
-  startOdo: z.string().nonempty({ message: 'Start Odo is required' }),
-  endOdo: z.string().nonempty({ message: 'End Odo is required' }),
-  imgUrl: z.string().optional().nullable(),
-  startDate: z.string().nonempty({ message: 'Start date is required' }),
-  endDate: z.string().nonempty({ message: 'End date is required' }),
-})
+export const PartSchema = z
+  .object({
+    partName: z.string().min(1, { message: 'Part name is required' }),
+    partNumber: z.string().min(1, { message: 'Part number is required' }),
+    startOdo: z.string().nonempty({ message: 'Start Odo is required' }),
+    endOdo: z.string().nonempty({ message: 'End Odo is required' }),
+    image: z.string().optional().nullable(),
+    startDate: z.string().nonempty({ message: 'Start date is required' }),
+    endDate: z.string().nonempty({ message: 'End date is required' }),
+  })
+  .refine(
+    (data) => parseInt(data.endOdo) >= parseInt(data.startOdo),
+    {
+      message: 'End odo must be greater than or equal to start odo',
+      path: ['endOdo'],
+    }
+  )
+  .refine(
+    (data) => new Date(data.endDate) >= new Date(data.startDate),
+    {
+      message: 'End date must be after start date',
+      path: ['endDate'],
+    }
+  )
 
 export const ProfileSchema = z.object({
   name: z

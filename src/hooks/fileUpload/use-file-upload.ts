@@ -17,7 +17,7 @@ export function useFileUpload() {
       formData.append('type', type)
       formData.append('publicId', publicId)
 
-      const res = await axiosInstance.post('/api/upload', formData, {
+      const res = await axiosInstance.post('/api/upload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

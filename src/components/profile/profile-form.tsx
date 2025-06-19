@@ -15,7 +15,6 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { ProfileSchema } from '@/schemas'
-import { useGetProfile } from '@/hooks/profile/use-get-profile'
 import { useUpdateProfile } from '@/hooks/profile/use-update-profile'
 import { useRouter } from 'next/navigation'
 import { useFileUpload } from '@/hooks/fileUpload/use-file-upload'
@@ -32,9 +31,8 @@ interface UpdateProfileMutationOptions {
 const ProfileForm = ({
   defaultValues,
 }: {
-  defaultValues: z.infer<typeof ProfileSchema>
+  defaultValues: z.infer<typeof ProfileSchema> & { id: string }
 }) => {
-  const { data: profile, isError, error } = useGetProfile()
   const router = useRouter()
   const {
     upload,
@@ -48,19 +46,17 @@ const ProfileForm = ({
     defaultValues,
   })
 
-  console.log(profile);
-
   useEffect(() => {
-    if (profile) {
-      form.reset({
-        name: profile.name || '',
-        image: profile.image || '',
-        phoneNumber: profile.phoneNumber || '',
-        dexp: profile.dexp || '',
-        rexp: profile.rexp || '',
-      })
-    }
-  }, [profile, form])
+  if (defaultValues) {
+    form.reset({
+      name: defaultValues.name || '',
+      image: defaultValues.image || '',
+      phoneNumber: defaultValues.phoneNumber || '',
+      dexp: defaultValues.dexp || '',
+      rexp: defaultValues.rexp || '',
+    })
+  }
+}, [defaultValues, form])
 
   useEffect(() => {
     if (selectedImage) {
@@ -75,6 +71,7 @@ const ProfileForm = ({
       router.push('/profile')
     },
     onError: (err: unknown): void => {
+      showToast.error('Profile failed to Update!')
       console.error('Failed to update profile:', err)
     },
   } as UpdateProfileMutationOptions)
@@ -82,12 +79,12 @@ const ProfileForm = ({
   const { isError: isMutationError, error: mutationError } = updateMutation
 
   const onSubmit = async (values: z.infer<typeof ProfileSchema>) => {
-    if (selectedImage && profile?.id) {
-      const url = await upload(
-        selectedImage,
-        'profiles',
-        `profile_image_${profile.id}`
-      )
+    if (selectedImage && defaultValues?.id) {
+      const url = await upload({
+        file: selectedImage,
+        type: 'profiles',
+        publicId: `profile_image_${defaultValues.id}`,
+      })
       if (url) {
         values.image = url
       }
@@ -109,11 +106,6 @@ const ProfileForm = ({
   useToast({
     isError: isFileUploadError,
     errorMsg: fileUploadError?.message,
-  })
-
-  useToast({
-    isError,
-    errorMsg: error?.message,
   })
 
   return (

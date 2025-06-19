@@ -13,16 +13,14 @@ export const EmptyState = ({
   message = 'There is no data available at the moment.',
 }: EmptyStateProps) => {
   return (
-    <div className='max-w-xl mx-auto mt-10'>
-      <Alert>
-        <div className='flex items-start gap-2'>
-          <MdOutlineHourglassEmpty className='mt-1 h-5 w-5 text-muted-foreground' />
-          <div>
-            <AlertTitle>{heading}</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </div>
-        </div>
-      </Alert>
+    <div className='max-w-3xl mx-auto mt-10'>
+      <div className='flex w-full gap-4'>
+        <Alert>
+          <MdOutlineHourglassEmpty />
+          <AlertTitle>{heading}</AlertTitle>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
+      </div>
     </div>
   )
 }

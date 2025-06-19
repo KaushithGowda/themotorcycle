@@ -49,6 +49,19 @@ import OdoSlider from '@/components/vehicles/odo-slider'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/lib/utils/toast'
 import { useToast } from '@/hooks/utils/use-toast'
+import { TiSpanner } from 'react-icons/ti'
+
+const FIELD_LABELS: Record<string, string> = {
+  make: 'Make',
+  model: 'Model',
+  color: 'Color',
+  dateOfReg: 'Date of Registration',
+  regNumber: 'Registration Number',
+  cubicCapacity: 'Cubic Capacity',
+  horsePower: 'Horse Power',
+  torque: 'Torque',
+  kerbWeight: 'Kerb Weight',
+}
 
 const VehicleForm = ({
   defaultValues,
@@ -175,27 +188,31 @@ const VehicleForm = ({
           htmlFor='cover-image'
           className='cursor-pointer flex justify-center'
         >
-          <div className='relative w-full h-50 rounded-xl overflow-hidden'>
+          <div className='relative w-full h-50 rounded-xl border-2 overflow-hidden'>
             {selectedCoverImage ? (
               <Image
                 src={URL.createObjectURL(selectedCoverImage)}
                 alt='cover preview'
                 fill
                 className='object-cover'
-                style={{ objectFit: 'cover' }}
                 sizes='100vw'
                 priority
               />
             ) : (
               <ImageWithFallback
                 src={
-                  defaultValues?.coverImage ?? '/uploads/cover-placeholder.jpg'
+                  defaultValues?.coverImage ??
+                  '/uploads/motorcycle-cover-photo.png'
                 }
                 alt='cover'
+                sizes='100vw'
                 fill
                 className='object-cover'
               />
             )}
+          </div>
+          <div className='bg-secondary rounded-lg absolute top-3 right-3 p-1'>
+            <TiSpanner size={30} />
           </div>
           <input
             id='cover-image'
@@ -228,13 +245,17 @@ const VehicleForm = ({
                   />
                 ) : (
                   <ImageWithFallback
-                    src={defaultValues?.image ?? '/uploads/image-not-found.png'}
+                    src={defaultValues?.image ?? '/uploads/car-photo.png'}
                     alt='vehicle'
                     fill
+                    sizes='240px'
                     className='object-cover'
                   />
                 )}
               </Card>
+              <div className='bg-secondary rounded-lg absolute top-2 right-2 z-10 p-1'>
+                <TiSpanner size={25} />
+              </div>
             </div>
             <input
               id='vehicle-image'
@@ -297,23 +318,7 @@ const VehicleForm = ({
                     render={({ field }) => (
                       <FormItem className='w-full'>
                         <FormLabel className='capitalize'>
-                          {fieldName === 'dateOfReg'
-                            ? 'Date of Registration'
-                            : fieldName === 'regNumber'
-                            ? 'Registration Number'
-                            : fieldName === 'cubicCapacity'
-                            ? 'Cubic Capacity'
-                            : fieldName === 'horsePower'
-                            ? 'Horse Power'
-                            : fieldName === 'kerbWeight'
-                            ? 'Kerb Weight'
-                            : fieldName === 'make'
-                            ? 'Make'
-                            : fieldName === 'model'
-                            ? 'Model'
-                            : fieldName === 'torque'
-                            ? 'Torque'
-                            : 'Color'}
+                          {FIELD_LABELS[fieldName]}
                         </FormLabel>
                         {fieldName === 'color' ? (
                           <FormControl>
@@ -338,8 +343,11 @@ const VehicleForm = ({
                                 {COLOR_OPTIONS.map(({ value, bg }) => (
                                   <SelectItem key={value} value={value}>
                                     <div className='flex items-center gap-2'>
-                                      <span className={`w-4 h-4 rounded-full border ${bg}`} />
-                                      {value.charAt(0).toUpperCase() + value.slice(1)}
+                                      <span
+                                        className={`w-4 h-4 rounded-full border ${bg}`}
+                                      />
+                                      {value.charAt(0).toUpperCase() +
+                                        value.slice(1)}
                                     </div>
                                   </SelectItem>
                                 ))}

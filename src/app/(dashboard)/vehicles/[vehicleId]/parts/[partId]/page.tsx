@@ -14,7 +14,6 @@ const EditPart = () => {
 
   const {
     data: vehicle,
-    isLoading,
     error,
     isError,
   } = usePartById(vehicleId, partId)
@@ -22,18 +21,17 @@ const EditPart = () => {
   useToast({
     isError,
     errorMsg: error?.message,
-    isLoading,
   })
 
   if (!vehicle && !isError)
     return (
       <EmptyState
         heading='Vehicle not found'
-        message='No vehicle data available for this ID.'
+        message='No vehicle data available for this vehicle'
       />
     )
 
-  if (isError || !vehicle)
+  if (isError)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   return (

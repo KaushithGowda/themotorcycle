@@ -6,7 +6,6 @@ import { MdForum } from 'react-icons/md'
 import { FaBlogger } from 'react-icons/fa'
 import { FaUser } from 'react-icons/fa'
 import { SiOrganicmaps } from 'react-icons/si'
-import { GiFullMotorcycleHelmet } from 'react-icons/gi'
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +20,7 @@ import {
 } from '@/components/ui/sidebar'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { TiSpanner } from 'react-icons/ti'
 
 const data = {
   navMain: [
@@ -63,11 +63,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <Link href='/' className='flex items-center gap-2 p-3 rounded-lg'>
-          <GiFullMotorcycleHelmet />
-          <span className='text-base font-semibold tracking-wide'>
-            themotorcycle
+        <Link href='/' className='flex items-center gap-1 p-2'>
+          <span className='text-base capitalize font-semibold tracking-wide'>
+            garage
           </span>
+          <TiSpanner />
         </Link>
       </SidebarHeader>
       <SidebarContent>

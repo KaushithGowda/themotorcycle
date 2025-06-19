@@ -60,7 +60,7 @@ const RegisterForm = ({ setUi }: RegisterFormProps) => {
           <div className='flex flex-col items-center text-center'>
             <h1 className='text-2xl font-bold'>Hey there, Welcome</h1>
             <p className='text-muted-foreground text-balance'>
-              Sign up to themotorcycle
+              Sign up to your garage
             </p>
           </div>
           <div className='grid gap-3'>

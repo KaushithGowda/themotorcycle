@@ -1,5 +1,5 @@
-import { axiosInstance } from "@/lib/api/axios"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { axiosInstance } from '@/lib/api/axios'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 // Delete part
 export const useDeletePart = ({
@@ -11,12 +11,12 @@ export const useDeletePart = ({
 }) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string) => {
-      const res = await axiosInstance.delete(`/api/parts/${id}`)
+    mutationFn: async (partId: string) => {
+      const res = await axiosInstance.delete(`/api/parts/${partId}`)
       return res.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['parts'] })
+      queryClient.invalidateQueries({ queryKey: ['part'] })
       onSuccess()
     },
     onError: (err) => {

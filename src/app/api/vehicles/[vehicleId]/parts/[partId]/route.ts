@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-
+import { PartSchema } from '@/schemas'
 
 export async function GET(request: NextRequest) {
   const session = await auth()
@@ -37,9 +37,13 @@ export async function PATCH(request: NextRequest) {
 
   const partId = request.nextUrl.pathname.split('/').pop()
   const body = await request.json()
-  if (!body.partName || typeof body.partName !== 'string') {
-    return NextResponse.json({ error: 'Invalid part name' }, { status: 400 })
+  const result = PartSchema.safeParse(body)
+
+  if (!result.success) {
+    return NextResponse.json({ error: 'Invalid part data' }, { status: 400 })
   }
+
+  const validatedData = result.data
 
   try {
     const updatedPart = await db.part.update({
@@ -47,19 +51,17 @@ export async function PATCH(request: NextRequest) {
         id: partId,
       },
       data: {
-        partName: body.partName,
-        partNumber: body.partNumber,
-        startOdo: body.startOdo,
-        endOdo: body.endOdo,
-        startDate: body.startDate,
-        endDate: body.endDate,
+        ...validatedData,
       },
     })
 
-    return NextResponse.json(updatedPart, { status: 200 })
+    return NextResponse.json({ part: updatedPart }, { status: 200 })
   } catch (error) {
     console.error('Error updating part:', error)
-    return NextResponse.json({ error: 'Failed to update part' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to update part' },
+      { status: 500 }
+    )
   }
 }
 
@@ -79,9 +81,15 @@ export async function DELETE(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ message: 'Part deleted successfully' }, { status: 200 })
+    return NextResponse.json(
+      { message: 'Part deleted successfully' },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Error deleting part:', error)
-    return NextResponse.json({ error: 'Failed to delete part' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Failed to delete part' },
+      { status: 500 }
+    )
   }
 }

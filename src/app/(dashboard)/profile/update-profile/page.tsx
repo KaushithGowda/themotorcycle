@@ -4,6 +4,7 @@ import ProfileForm from '@/components/profile/profile-form'
 import { useGetProfile } from '@/hooks/profile/use-get-profile'
 import { useToast } from '@/hooks/utils/use-toast'
 import { ErrorState } from '@/components/shared/error-state'
+import { EmptyState } from '@/components/shared/empty-state'
 
 const UpdateProfile = () => {
   const { data, isError, error } = useGetProfile()
@@ -13,7 +14,9 @@ const UpdateProfile = () => {
     errorMsg: error?.message,
   })
 
-  if (isError || !data)
+  if (!data && !isError) return <EmptyState heading='Data not found!' message='Profile data not found' />
+
+  if (isError)
     return <ErrorState heading={error?.name} message={error?.message} />
 
   return (
