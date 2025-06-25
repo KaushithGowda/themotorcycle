@@ -37,10 +37,11 @@ export default auth((req) => {
 export const config = {
   matcher: [
     // Match everything except static files and /auth
-    '/((?!_next|.*\\..*|auth|api/auth|api/upload).*)',
+    '/((?!api/mobile-login|_next|.*\\..*|auth|api/auth|api/upload).*)',
   ],
 }
 
+// '/((?!_next|.*\\..*|auth|api/auth|api/upload).*)',
 // export const config = {
 //   matcher: [
 //     // Skip Next.js internals and all static files, unless found in search params

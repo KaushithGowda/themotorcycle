@@ -7,7 +7,6 @@ import bcrypt from 'bcryptjs'
 import { signJwt } from '@/lib/jwt'
 
 export async function POST(req: NextRequest) {
-  console.log('Incoming mobile login request')
 
   const body = await req.json()
   const result = LoginSchema.safeParse(body)
@@ -19,8 +18,18 @@ export async function POST(req: NextRequest) {
   const { email, password } = result.data
   const user = await getUserByEmail(email)
 
-  if (!user || !user.password) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  }
+
+  if (!user.password) {
+    return NextResponse.json(
+      {
+        error:
+          'This email is registered via Google Sign-In. Please use Google login.',
+      },
+      { status: 403 }
+    )
   }
 
   const isValid = await bcrypt.compare(password, user.password)
