@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import { signJwt } from '@/lib/jwt' // You’ll need to implement this if not already
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('Incoming mobile login request',req)
   if (req.method !== 'POST') return res.status(405).end()
 
   const body = req.body
