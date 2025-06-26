@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
+import { verifyJwt } from '@/lib/token'
 
 // GET current user profile
-export async function GET() {
-  const session = await auth()
+export async function GET(req: NextRequest) {
+  console.log('here',req);
+  
+  let email: string | null = null
 
-  if (!session || !session.user?.email) {
+  // Try to get session from cookie (web)
+  const session = await auth()
+  if (session?.user?.email) {
+    email = session.user.email
+  } else {
+    // Fallback to JWT (mobile)
+    const authHeader = req.headers.get('authorization')
+    const token = authHeader?.split(' ')[1]
+    if (token) {
+      const payload = await verifyJwt(token)
+      if (payload?.email && typeof payload.email === 'string') {
+        email = payload.email
+      }
+    }
+  }
+
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
     const user = await db.user.findUnique({
-      where: { email: session.user.email },
+      where: { email },
       select: {
         id: true,
         name: true,
@@ -31,7 +50,7 @@ export async function GET() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json(user , { status: 200 })
+    return NextResponse.json(user, { status: 200 })
   } catch (error) {
     console.error('Error fetching user profile:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
@@ -39,19 +58,35 @@ export async function GET() {
 }
 
 // PATCH update user profile
-export async function PATCH(request: NextRequest) {
-  const session = await auth()
+export async function PATCH(req: NextRequest) {
+  let email: string | null = null
 
-  if (!session || !session.user?.email) {
+  // Try to get session from cookie (web)
+  const session = await auth()
+  if (session?.user?.email) {
+    email = session.user.email
+  } else {
+    // Fallback to JWT (mobile)
+    const authHeader = req.headers.get('authorization')
+    const token = authHeader?.split(' ')[1]
+    if (token) {
+      const payload = await verifyJwt(token)
+      if (payload?.email && typeof payload.email === 'string') {
+        email = payload.email
+      }
+    }
+  }
+
+  if (!email) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const body = await request.json()
+    const body = await req.json()
     const { name, image, phoneNumber, dexp, rexp } = body
 
     const updatedUser = await db.user.update({
-      where: { email: session.user.email },
+      where: { email },
       data: {
         name,
         image,

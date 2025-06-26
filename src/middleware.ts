@@ -36,18 +36,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Match everything except static files and /auth
-    '/((?!api/mobile-login|_next|.*\\..*|auth|api/auth|api/upload).*)',
+    '/((?!api|_next|.*\\..*|auth).*)',
   ],
 }
-
-// '/((?!_next|.*\\..*|auth|api/auth|api/upload).*)',
-// export const config = {
-//   matcher: [
-//     // Skip Next.js internals and all static files, unless found in search params
-//     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-//     // Always run for API routes
-//     '/(api|trpc)(.*)',
-//     '/((?!api/upload).*)'
-//   ],
-// }
